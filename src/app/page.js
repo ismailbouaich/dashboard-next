@@ -10,7 +10,6 @@ export default function Home() {
   const router = useRouter();
 
   useEffect(() => {
-    // If auth state is loaded, redirect based on authentication
     if (!loading) {
       if (isAuthenticated) {
         router.push('/dashboard');
@@ -20,7 +19,6 @@ export default function Home() {
     }
   }, [isAuthenticated, loading, router]);
 
-  // Show a simple loading state while determining where to redirect
   return (
     <div className="flex items-center justify-center min-h-screen bg-background">
       <div className="text-center">

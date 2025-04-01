@@ -30,7 +30,6 @@ const columns = [
       header: "Image",
       cell: ({ row }) => (
         <div className="w-[80px]">
-         // Update your image URLs to use a public service
 <img
   src={row.getValue("image_url") || "https://placehold.co/80x60"}
   alt={`${row.getValue("make")} ${row.getValue("model")}`}
@@ -162,10 +161,10 @@ export default function VehiclesPage() {
   
   useEffect(() => {
     getVehicles();
-  }, [getVehicles]);
+  }, []);
   
   return (
-    <div className="container mx-auto py-4">
+    <div className="container mx-auto px-4 py-4">
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-2xl font-bold">Vehicles</h1>
         <Button onClick={() => router.push('/dashboard/vehicles/create')}>

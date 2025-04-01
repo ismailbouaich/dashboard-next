@@ -22,28 +22,31 @@ export const db = {
       return { data, error };
     },
 
-    getById: async(id)=>{
-        const {data,error}= await supabase
-        .form('cars')
+    getById: async(id) => {
+        const { data, error } = await supabase
+        .from('cars')
         .select('*')
-        .eq('id',id)
+        .eq('id', id)
         .single();
-        return {data,error};
+        return { data, error };
     },
 
-    create: async(vehicleData)=>{
-        const {data,error}=await supabase
+    create: async(vehicleData) => {
+        const { data, error } = await supabase
         .from('cars')
         .insert([vehicleData])
         .select();
-        return {data,error};
+        return { data: data?.[0], error };
     },
 
-    update: async(id,vehicleData)=>{
-        const {data,error}= await supabase.from('cars').update([vehicleData]).eq('id',id).select();
-        return{data,error};
+    update: async(id, vehicleData) => {
+        const { data, error } = await supabase
+        .from('cars')
+        .update(vehicleData)
+        .eq('id', id)
+        .select();
+        return { data: data?.[0], error };
     },
-
     
     delete: async (id) => {
         const { error } = await supabase
@@ -51,14 +54,84 @@ export const db = {
           .delete()
           .eq('id', id);
         return { error };
-      }
-
+    }
   },
+  
+  // Bookings
+  bookings: {
+    getAll: async () => {
+      const { data, error } = await supabase
+        .from('bookings')
+        .select(`
+          *,
+          car:car_id(*),
+          user:user_id(*)
+        `)
+        .order('created_at', { ascending: false });
+      return { data, error };
+    },
 
+    getById: async (id) => {
+      const { data, error } = await supabase
+        .from('bookings')
+        .select(`
+          *,
+          car:car_id(*),
+          user:user_id(*)
+        `)
+        .eq('id', id)
+        .single();
+      return { data, error };
+    },
 
+    getByUserId: async (userId) => {
+      const { data, error } = await supabase
+        .from('bookings')
+        .select(`
+          *,
+          car:car_id(*)
+        `)
+        .eq('user_id', userId)
+        .order('created_at', { ascending: false });
+      return { data, error };
+    },
+
+    create: async (bookingData) => {
+      const { data, error } = await supabase
+        .from('bookings')
+        .insert([bookingData])
+        .select();
+      return { data: data?.[0], error };
+    },
+
+    update: async (id, bookingData) => {
+      const { data, error } = await supabase
+        .from('bookings')
+        .update(bookingData)
+        .eq('id', id)
+        .select();
+      return { data: data?.[0], error };
+    },
+    
+    delete: async (id) => {
+      const { error } = await supabase
+        .from('bookings')
+        .delete()
+        .eq('id', id);
+      return { error };
+    }
+  },
   
   // Profiles
   profiles: {
+    getAll: async () => {
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('*')
+        .order('created_at', { ascending: false });
+      return { data, error };
+    },
+    
     getById: async (id) => {
       const { data, error } = await supabase
         .from('profiles')
@@ -67,7 +140,45 @@ export const db = {
         .single();
       return { data, error };
     },
-    // Add other profile methods as needed
+    
+    create: async (profileData) => {
+      const { data, error } = await supabase
+        .from('profiles')
+        .insert([profileData])
+        .select();
+      return { data: data?.[0], error };
+    },
+    
+    update: async (id, profileData) => {
+      const { data, error } = await supabase
+        .from('profiles')
+        .update(profileData)
+        .eq('id', id)
+        .select();
+      return { data: data?.[0], error };
+    }
   },
   
+  // Reviews
+  reviews: {
+    getByCarId: async (carId) => {
+      const { data, error } = await supabase
+        .from('reviews')
+        .select(`
+          *,
+          user:user_id(*)
+        `)
+        .eq('car_id', carId)
+        .order('created_at', { ascending: false });
+      return { data, error };
+    },
+    
+    create: async (reviewData) => {
+      const { data, error } = await supabase
+        .from('reviews')
+        .insert([reviewData])
+        .select();
+      return { data: data?.[0], error };
+    }
+  }
 };

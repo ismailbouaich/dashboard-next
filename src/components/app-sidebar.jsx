@@ -2,12 +2,15 @@
 
 import * as React from "react"
 import {
+  IconCalendarEvent,
   IconCamera,
+  IconCar,
   IconChartBar,
   IconDashboard,
   IconDatabase,
   IconFileAi,
   IconFileDescription,
+  IconFileReport,
   IconFileWord,
   IconFolder,
   IconHelp,
@@ -32,127 +35,145 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar"
+import { usePathname } from 'next/navigation';
 
-const data = {
-  user: {
-    name: "shadcn",
-    email: "m@example.com",
-    avatar: "/avatars/shadcn.jpg",
-  },
-  navMain: [
-    {
-      title: "Dashboard",
-      url: "#",
-      icon: IconDashboard,
-    },
-    {
-      title: "Lifecycle",
-      url: "#",
-      icon: IconListDetails,
-    },
-    {
-      title: "Analytics",
-      url: "#",
-      icon: IconChartBar,
-    },
-    {
-      title: "Projects",
-      url: "#",
-      icon: IconFolder,
-    },
-    {
-      title: "Team",
-      url: "#",
-      icon: IconUsers,
-    },
-  ],
-  navClouds: [
-    {
-      title: "Capture",
-      icon: IconCamera,
-      isActive: true,
-      url: "#",
-      items: [
-        {
-          title: "Active Proposals",
-          url: "#",
-        },
-        {
-          title: "Archived",
-          url: "#",
-        },
-      ],
-    },
-    {
-      title: "Proposal",
-      icon: IconFileDescription,
-      url: "#",
-      items: [
-        {
-          title: "Active Proposals",
-          url: "#",
-        },
-        {
-          title: "Archived",
-          url: "#",
-        },
-      ],
-    },
-    {
-      title: "Prompts",
-      icon: IconFileAi,
-      url: "#",
-      items: [
-        {
-          title: "Active Proposals",
-          url: "#",
-        },
-        {
-          title: "Archived",
-          url: "#",
-        },
-      ],
-    },
-  ],
-  navSecondary: [
-    {
-      title: "Settings",
-      url: "#",
-      icon: IconSettings,
-    },
-    {
-      title: "Get Help",
-      url: "#",
-      icon: IconHelp,
-    },
-    {
-      title: "Search",
-      url: "#",
-      icon: IconSearch,
-    },
-  ],
-  documents: [
-    {
-      name: "Data Library",
-      url: "#",
-      icon: IconDatabase,
-    },
-    {
-      name: "Reports",
-      url: "#",
-      icon: IconReport,
-    },
-    {
-      name: "Word Assistant",
-      url: "#",
-      icon: IconFileWord,
-    },
-  ],
-}
+
+
 
 export function AppSidebar({
   ...props
 }) {
+
+  const pathname = usePathname();
+
+  const isActive = (path) => {
+    return pathname === path || pathname.startsWith(`${path}/`);
+  };
+
+  const data = {
+    user: {
+      name: "shadcn",
+      email: "m@example.com",
+      avatar: "/avatars/shadcn.jpg",
+    },
+    navMain: [
+      {
+        title: "Dashboard",
+        url: "/dashboard",
+        icon: IconDashboard,
+        active: isActive('/dashboard') && !isActive('/dashboard/vehicles') && !isActive('/dashboard/bookings'),
+      },
+      {
+        title: "Vehicles",
+        url: "/dashboard/vehicles",
+        icon: IconCar,
+        active: isActive('/dashboard/vehicles'),
+      },
+      {
+        title: "Bookings",
+        url: "/dashboard/bookings",
+        icon: IconCalendarEvent,
+        active: isActive('/dashboard/bookings'),
+      },
+      {
+        title: "Customers",
+        url: "/dashboard/customers",
+        icon: IconUsers,
+        active: isActive('/dashboard/customers'),
+      },
+      {
+        title: "Reports",
+        url: "/dashboard/reports",
+        icon: IconFileReport,
+        active: isActive('/dashboard/reports'),
+      },
+    ],
+    navClouds: [
+      {
+        title: "Capture",
+        icon: IconCamera,
+        isActive: true,
+       url: "/dashboard",
+        items: [
+          {
+            title: "Active Proposals",
+           url: "/dashboard",
+          },
+          {
+            title: "Archived",
+           url: "/dashboard",
+          },
+        ],
+      },
+      {
+        title: "Proposal",
+        icon: IconFileDescription,
+       url: "/dashboard",
+        items: [
+          {
+            title: "Active Proposals",
+           url: "/dashboard",
+          },
+          {
+            title: "Archived",
+           url: "/dashboard",
+          },
+        ],
+      },
+      {
+        title: "Prompts",
+        icon: IconFileAi,
+       url: "/dashboard",
+        items: [
+          {
+            title: "Active Proposals",
+           url: "/dashboard",
+          },
+          {
+            title: "Archived",
+           url: "/dashboard",
+          },
+        ],
+      },
+    ],
+    navSecondary: [
+      {
+        title: "Settings",
+       url: "/dashboard",
+        icon: IconSettings,
+      },
+      {
+        title: "Get Help",
+       url: "/dashboard",
+        icon: IconHelp,
+      },
+      {
+        title: "Search",
+       url: "/dashboard",
+        icon: IconSearch,
+      },
+    ],
+    documents: [
+      {
+        name: "Data Library",
+       url: "/dashboard",
+        icon: IconDatabase,
+      },
+      {
+        name: "Reports",
+       url: "/dashboard",
+        icon: IconReport,
+      },
+      {
+        name: "Word Assistant",
+       url: "/dashboard",
+        icon: IconFileWord,
+      },
+    ],
+  }
+ 
+
+
   return (
     (<Sidebar collapsible="offcanvas" {...props}>
       <SidebarHeader>
