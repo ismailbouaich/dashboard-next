@@ -10,7 +10,7 @@ export default function CreateBookingPage() {
   const router = useRouter();
   
   return (
-    <div className="container mx-auto py-4">
+    <div className="container mx-auto py-4 p-4">
       <div className="mb-6">
         <Button 
           variant="outline" 

@@ -160,7 +160,7 @@ export default function BookingsPage() {
   ];
   
   return (
-    <div className="container mx-auto py-4">
+    <div className="container mx-auto py-4 p-4">
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-2xl font-bold">Bookings</h1>
         <Button onClick={() => router.push('/dashboard/bookings/create')}>

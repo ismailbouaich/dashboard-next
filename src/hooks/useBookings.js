@@ -9,7 +9,7 @@ export function useBookings() {
   const [booking, setBooking] = useState(null);
   const [loading, setLoading] = useState(false);
   
-  // Get all bookings with related car and user data
+  // Get all bookings with related car and customer data
   const getBookings = async () => {
     setLoading(true);
     try {
@@ -18,7 +18,8 @@ export function useBookings() {
         .select(`
           *,
           car:car_id(*),
-          user:user_id(*)
+          user:user_id(*),
+          customer:customer_id(*)
         `)
         .order('created_at', { ascending: false });
       
@@ -46,7 +47,8 @@ export function useBookings() {
         .select(`
           *,
           car:car_id(*),
-          user:user_id(*)
+          user:user_id(*),
+          customer:customer_id(*)
         `)
         .eq('id', id)
         .single();
@@ -63,8 +65,126 @@ export function useBookings() {
       setLoading(false);
     }
   };
+
+  // Get bookings by customer ID
+  const getBookingsByCustomer = async (customerId) => {
+    if (!customerId) return [];
+    
+    setLoading(true);
+    try {
+      const { data, error } = await supabase
+        .from('bookings')
+        .select(`
+          *,
+          car:car_id(*),
+          customer:customer_id(*)
+        `)
+        .eq('customer_id', customerId)
+        .order('created_at', { ascending: false });
+      
+      if (error) throw error;
+      
+      return data || [];
+    } catch (error) {
+      console.error(`Error fetching bookings for customer ${customerId}:`, error);
+      toast.error('Failed to fetch customer bookings');
+      return [];
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Get bookings by user ID (authenticated bookings)
+  const getBookingsByUser = async (userId) => {
+    if (!userId) return [];
+    
+    setLoading(true);
+    try {
+      const { data, error } = await supabase
+        .from('bookings')
+        .select(`
+          *,
+          car:car_id(*),
+          customer:customer_id(*)
+        `)
+        .eq('user_id', userId)
+        .order('created_at', { ascending: false });
+      
+      if (error) throw error;
+      
+      return data || [];
+    } catch (error) {
+      console.error(`Error fetching bookings for user ${userId}:`, error);
+      toast.error('Failed to fetch user bookings');
+      return [];
+    } finally {
+      setLoading(false);
+    }
+  };
   
-  // Create a new booking
+  // Create a new booking with customer data
+  const createBookingWithCustomer = async (bookingData, customerData, isNewCustomer = true) => {
+    setLoading(true);
+    try {
+      // Start a transaction
+      let customerId = customerData.id;
+      
+      // If new customer or no customer ID provided, create/update customer record
+      if (isNewCustomer || !customerId) {
+        // Check if customer with this email already exists
+        const { data: existingCustomer } = await supabase
+          .from('customers')
+          .select('id')
+          .eq('email', customerData.email)
+          .maybeSingle();
+        
+        if (existingCustomer) {
+          // Update existing customer
+          const { data: updatedCustomer, error: updateError } = await supabase
+            .from('customers')
+            .update(customerData)
+            .eq('id', existingCustomer.id)
+            .select('id');
+          
+          if (updateError) throw updateError;
+          customerId = updatedCustomer[0].id;
+        } else {
+          // Create new customer
+          const { data: newCustomer, error: createError } = await supabase
+            .from('customers')
+            .insert([customerData])
+            .select('id');
+          
+          if (createError) throw createError;
+          customerId = newCustomer[0].id;
+        }
+      }
+      
+      // Create booking with customer ID
+      const finalBookingData = {
+        ...bookingData,
+        customer_id: customerId
+      };
+      
+      const { data, error } = await supabase
+        .from('bookings')
+        .insert([finalBookingData])
+        .select();
+      
+      if (error) throw error;
+      
+      toast.success('Booking created successfully');
+      return data[0];
+    } catch (error) {
+      console.error('Error creating booking with customer:', error);
+      toast.error('Failed to create booking');
+      return null;
+    } finally {
+      setLoading(false);
+    }
+  };
+  
+  // Create a new booking (original method preserved for compatibility)
   const createBooking = async (bookingData) => {
     setLoading(true);
     try {
@@ -166,7 +286,10 @@ export function useBookings() {
     loading,
     getBookings,
     getBooking,
+    getBookingsByCustomer,
+    getBookingsByUser,
     createBooking,
+    createBookingWithCustomer,
     updateBooking,
     changeBookingStatus,
     deleteBooking

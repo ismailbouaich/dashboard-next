@@ -58,6 +58,52 @@ export const db = {
   },
   
   // Bookings
+  customers: {
+    getAll: async () => {
+      const { data, error } = await supabase
+        .from('customers')
+        .select('*')
+        .order('created_at', { ascending: false });
+      return { data, error };
+    },
+    
+    getById: async (id) => {
+      const { data, error } = await supabase
+        .from('customers')
+        .select('*')
+        .eq('id', id)
+        .single();
+      return { data, error };
+    },
+    
+    getByEmail: async (email) => {
+      const { data, error } = await supabase
+        .from('customers')
+        .select('*')
+        .eq('email', email)
+        .single();
+      return { data, error };
+    },
+    
+    create: async (customerData) => {
+      const { data, error } = await supabase
+        .from('customers')
+        .insert([customerData])
+        .select();
+      return { data: data?.[0], error };
+    },
+    
+    update: async (id, customerData) => {
+      const { data, error } = await supabase
+        .from('customers')
+        .update(customerData)
+        .eq('id', id)
+        .select();
+      return { data: data?.[0], error };
+    }
+  },
+  
+  // Bookings
   bookings: {
     getAll: async () => {
       const { data, error } = await supabase
@@ -65,37 +111,38 @@ export const db = {
         .select(`
           *,
           car:car_id(*),
-          user:user_id(*)
+          customer:customer_id(*)
         `)
         .order('created_at', { ascending: false });
       return { data, error };
     },
-
+    
     getById: async (id) => {
       const { data, error } = await supabase
         .from('bookings')
         .select(`
           *,
           car:car_id(*),
-          user:user_id(*)
+          customer:customer_id(*)
         `)
         .eq('id', id)
         .single();
       return { data, error };
     },
-
-    getByUserId: async (userId) => {
+    
+    getByCustomerId: async (customerId) => {
       const { data, error } = await supabase
         .from('bookings')
         .select(`
           *,
-          car:car_id(*)
+          car:car_id(*),
+          customer:customer_id(*)
         `)
-        .eq('user_id', userId)
-        .order('created_at', { ascending: false });
+        .eq('customer_id', customerId)
+        .order('start_date', { ascending: false });
       return { data, error };
     },
-
+    
     create: async (bookingData) => {
       const { data, error } = await supabase
         .from('bookings')
@@ -103,7 +150,7 @@ export const db = {
         .select();
       return { data: data?.[0], error };
     },
-
+    
     update: async (id, bookingData) => {
       const { data, error } = await supabase
         .from('bookings')
